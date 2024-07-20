@@ -1,50 +1,49 @@
 pipeline {
     agent any
-    
+
     stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/PiyushKotadiya/hello-world.git'
+            }
+        }
+
         stage('Build') {
             steps {
-                script {
-                    echo 'Building Hello World application...'
-                    bat 'npm install'
-                    bat 'npm run build'
-                }
+                echo 'Building Hello World application...'
+                bat 'npm install'
+                // Remove or update this line if no build step is required
+                // bat 'npm run build'
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
-                script {
-                    echo 'Building Docker image...'
-                    bat 'docker build -t hello-world-app:latest .'
-                }
+                echo 'Building Docker image...'
+                bat 'docker build -t hello-world-app .'
             }
         }
-        
+
         stage('Test') {
             steps {
-                script {
-                    echo 'Running tests...'
-                    bat 'npm test'
-                }
+                echo 'Running tests...'
+                bat 'npm test'
             }
         }
-        
+
         stage('Deploy') {
             steps {
-                script {
-                    echo 'Deploying Docker image...'
-                    // Deployment steps, e.g., push to Docker registry or deploy to Kubernetes
-                }
+                echo 'Deploying application...'
+                bat 'docker run -d -p 80:80 hello-world-app'
             }
         }
     }
-    
+
     post {
         always {
             mail to: 'piyushkotadiya801@gmail.com',
-                 subject: "Jenkins Build ${currentBuild.fullDisplayName}",
-                 body: "Build result: ${currentBuild.currentResult}\n\nCheck console output at ${env.BUILD_URL}console"
+                 subject: "Pipeline Status: ${currentBuild.currentResult}",
+                 body: "Pipeline ${currentBuild.fullDisplayName} finished with status: ${currentBuild.currentResult}"
         }
     }
 }
