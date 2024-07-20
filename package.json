@@ -1,0 +1,9 @@
+stage('Build') {
+    steps {
+        script {
+            echo 'Building Hello World application...'
+            bat 'npm install'
+            bat 'npm run build'
+        }
+    }
+}
